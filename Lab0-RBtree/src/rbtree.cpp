@@ -1,5 +1,8 @@
+#include <iostream>
 #include <algorithm> 
 #include "rbtree.h"
+
+using namespace std;
 
 Nodo::Nodo(int dato){
     this->dato = dato;
@@ -112,6 +115,28 @@ Nodo* RBtree::insertarNodo(Nodo* &padre, Nodo* &puntero){
 }
 
 
+void RBtree::RBremove(Nodo* &puntero, int caso) {
+    switch (caso) {
+    case 1: //NODO ES UNA HOJA
+        if(puntero->color == RED) {
+            if(puntero->dato < puntero->father->dato) {
+            puntero->father->left = nullptr;
+            }
+            else {
+                puntero->father->right = nullptr;
+            }
+            delete puntero;
+        }
+        break;
+    case 2: //NODO NO ES HOJA
+
+        break;
+    case 3:
+
+        break;
+    }
+} // INCOMPLETO
+
 void RBtree::corregirArbol(Nodo* &puntero){
     Nodo* padre  = nullptr;
     Nodo* abuelo = nullptr;
@@ -128,7 +153,7 @@ void RBtree::corregirArbol(Nodo* &puntero){
                 setColor(padre ,BLACK);
                 setColor(tio   ,BLACK);
                 setColor(abuelo,RED  );
-                puntero = padre;
+                puntero = abuelo;
             }
             else{
                 // CASO II: padre y el hijo tienen distintas direcciones
@@ -145,7 +170,7 @@ void RBtree::corregirArbol(Nodo* &puntero){
             }
         }
 
-        // El padre esta a la derecha
+            // El padre esta a la derecha
         else{
             Nodo* tio = abuelo->left;
 
@@ -154,7 +179,7 @@ void RBtree::corregirArbol(Nodo* &puntero){
                 setColor(padre ,BLACK);
                 setColor(tio   ,BLACK);
                 setColor(abuelo,RED  );
-                puntero = padre;
+                puntero = abuelo;
             }
             else{
                 // CASO II: padre y el hijo tienen distintas direcciones
@@ -171,7 +196,7 @@ void RBtree::corregirArbol(Nodo* &puntero){
             }
         }
     }
-    
+    setColor(root,BLACK);
 }
 
 void RBtree::insertar(int dato){
@@ -180,9 +205,137 @@ void RBtree::insertar(int dato){
     corregirArbol(puntero);
 }
 
+
+void RBtree::remover(int valor) {
+    if(this->root == nullptr) {
+        return;
+    }
+    if(this->root->dato == valor && this->root->left == nullptr && this->root->right == nullptr) {
+        this->root = nullptr;
+        return;
+    }
+    Nodo *puntero = this->root;
+    while (true) {
+        if(puntero == nullptr) {
+            return;
+        }
+        if(puntero->dato == valor) {
+            break;
+        }
+        else if(puntero->dato > valor) {
+            puntero = puntero->left;
+        }
+        else {
+            puntero = puntero->right;
+        }
+    }
+    if(puntero->left == nullptr && puntero->right == nullptr) {
+        RBremove(puntero, 1);
+    }
+    else if(puntero->left != nullptr) {
+        Nodo* temp = puntero->left;
+        if(temp->right == nullptr) {
+            puntero->dato = temp->dato;
+            // RBremove(puntero, 2);
+            puntero->left = temp->left;
+            delete temp;
+        }
+        else {
+            while(temp->right->right != nullptr) {
+                temp = temp->right;
+            }
+            puntero->dato = temp->right->dato;
+            
+            if(temp->right->left == nullptr) {
+                delete temp->right;
+                temp->right = nullptr;
+            }
+            else {
+                temp->right = temp->right->left;
+            }
+        }
+    }
+    else {
+        Nodo* temp = puntero->right;
+        if(temp->left == nullptr) {
+            puntero->dato = temp->dato;
+            puntero->right = temp->right;
+            delete temp;
+        }
+        else {
+            while(temp->left->left != nullptr) {
+                temp = temp->left;
+            }
+            puntero->dato = temp->left->dato;
+            if(temp->left->right == nullptr) {
+                delete temp->left;
+                temp->left = nullptr;
+            }
+            else {
+                temp->left = temp->left->right;
+            }
+        }
+    }
+}
+
 RBtree::RBtree(){
     root = nullptr;
 }
 
 RBtree::~RBtree(){
+}
+
+
+vector<int> RBtree::inorder() {
+    vector<int> vec;
+    if(this->root != nullptr) {
+        inorderaux(this->root, vec);
+    }
+    return vec;
+}
+
+void RBtree::inorderaux(Nodo* node, vector<int> &vec) {
+    if(node->left != nullptr) {
+        inorderaux(node->left, vec);
+    }
+    vec.push_back(node->dato);
+    if(node->right != nullptr) {
+        inorderaux(node->right, vec);
+    }
+}
+
+vector<int> RBtree::preorder() {
+    vector<int> vec;
+    if(this->root != nullptr) {
+        preorderaux(this->root, vec);
+    }
+    return vec;
+}
+
+void RBtree::preorderaux(Nodo* node, vector<int> &vec) {
+    vec.push_back(node->dato);
+    if(node->left != nullptr) {
+        preorderaux(node->left, vec);
+    }
+    if(node->right != nullptr) {
+        preorderaux(node->right, vec);
+    }
+}
+
+vector<int> RBtree::postorder() {
+    vector<int> vec;
+    if(this->root != nullptr) {
+        postorderaux(this->root, vec);
+    }
+    return vec;
+}
+
+void RBtree::postorderaux(Nodo* node, vector<int> &vec) {
+    if(node->left != nullptr) {
+        postorderaux(node->left, vec);
+    }
+    if(node->right != nullptr) {
+        postorderaux(node->right, vec);
+    }
+    vec.push_back(node->dato);
 }

@@ -1,6 +1,10 @@
 #ifndef RBTREE_H
 #define RBTREE_H
 
+#include <vector>
+
+using namespace std;
+
 // Lista de colores del arbol
 enum Color {RED,BLACK};
 
@@ -23,6 +27,7 @@ class RBtree
 private:
     Nodo *root;
     Nodo *insertarNodo(Nodo* &, Nodo* &);
+    void RBremove(Nodo* &puntero, int caso);
     void corregirArbol(Nodo* &);
 
     int getColor(Nodo* &);
@@ -34,11 +39,19 @@ private:
 public:
     RBtree();
     void insertar(int);
+    void remover(int valor);
 
     ~RBtree();
+
+    vector<int> inorder();
+    void inorderaux(Nodo* node, vector<int> &vec);
+    vector<int> preorder();
+    void preorderaux(Nodo* node, vector<int> &vec);
+    vector<int> postorder();
+    void postorderaux(Nodo* node, vector<int> &vec);
 };
 
-
+ 
 
 
 

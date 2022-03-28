@@ -6,4 +6,6 @@ set(CMAKE_CXX_STANDARD)
 include_directories(./src)
 add_executable(compilado
     src/main.cpp
+    src/rbtree.cpp
+    src/rbtree.h
 )
